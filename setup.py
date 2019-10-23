@@ -20,7 +20,6 @@ setup(
     install_requires = [
                 'networkx>=2.0',
                 'numpy>=1.14',
-                'scipy>=1.1',
             ],
     include_package_data = True,
     zip_safe = False,
