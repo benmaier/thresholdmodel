@@ -1,5 +1,5 @@
 import numpy as np
-import networkx
+import networkx as nx
 
 import random
 
@@ -8,22 +8,21 @@ _I = 1
 
 class ThreshModel():
     
-    G = None
-    N = None
-    node_status = None
-    initially_activated = []
-    activated = []
-    node_status = []
-
-
     def __init__(self,
             G,
             initially_activated,
             thresholds,
+            weight=None,
             ):
 
-        self.N = G.number_of_nodes()
-        self.k = np.array([G.degree(i) for i in G.nodes()],dtype=float)
+        self.G = G
+        self.N = self.G.number_of_nodes()
+        self.weight = weight
+
+        if nx.is_directed(G):
+            self.in_deg = np.array([self.G.in_degree(i,weight=weight) for i in G.nodes()],dtype=float)
+        else:
+            self.in_deg = np.array([self.G.degree(i,weight=weight) for i in G.nodes()],dtype=float)
 
         self.set_initially_activated(initially_activated)
         self.set_thresholds(thresholds)
@@ -38,7 +37,7 @@ class ThreshModel():
             assert(len(thresholds) == N)
             assert(np.all(thresholds <= 1) and np.all(thresholds>=0))
 
-        self.thresholds = np.array(thresholds,dtype=float) * self.k
+        self.thresholds = np.array(thresholds,dtype=float) * self.in_deg
 
 
     def set_initially_activated(self,initially_activated):
@@ -68,9 +67,12 @@ class ThreshModel():
 
         nodes_with_influx = set()
         for a in self.initially_activated:
-            for neigh in G.neighbors(a):
+            for neigh in self.G.neighbors(a):
                 if self.node_status[neigh] == _S:
-                    self.activation_influx[neigh] += 1
+                    if not self.weight:
+                        self.activation_influx[neigh] += 1
+                    else:
+                        self.activation_influx[neigh] += self.G.edges[a,neigh][weight]
                     nodes_with_influx.add(neigh)
 
         for i in nodes_with_influx:
@@ -97,9 +99,12 @@ class ThreshModel():
             self.node_status[activated_node] = _I
             self.nodes_that_will_flip.remove(activated_node)
 
-            for neigh in G.neighbors(activated_node):
+            for neigh in self.G.neighbors(activated_node):
                 if self.node_status[neigh] == _S:
-                    self.activation_influx[neigh] += 1
+                    if not self.weight:
+                        self.activation_influx[neigh] += 1
+                    else:
+                        self.activation_influx[neigh] += self.G.edges[activated_node,neigh][weight]
                     if self.activation_influx[neigh] >= self.thresholds[neigh]:
                         self.nodes_that_will_flip.add(neigh)
 
