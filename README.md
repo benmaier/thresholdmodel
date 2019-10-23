@@ -4,7 +4,7 @@ Simulate the continuous-time threshold model on static networks using Gillespie'
 
 ## Install
 
-    git clone
+    git clone https://github.com/benmaier/thresholdmodel.git
     pip install ./thresholdmodel
 
 ## Example
