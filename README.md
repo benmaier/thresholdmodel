@@ -103,7 +103,7 @@ You can also set a universal threshold
 thresholds = 0.1
 ```
 
-Here, 10% of a node's neighbor's need to be activated in order for the node to become active, too.
+Here, 10% of a node's neighbors need to be activated in order for the node to become active, too.
 
 ### Directed networks
 
