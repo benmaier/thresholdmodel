@@ -5,7 +5,7 @@ Gillespie's stochastic simulation algorithm (SSA).
 The networks can be directed and/or weighted.
 
 In contrast to the original discrete-time model, nodes
-whose aggregated inputs exceed their respective thresholdes
+whose aggregated inputs exceed their respective thresholds
 will not flip after the "next time step" because there
 are no time steps. Instead, a node whose threshold
 has been exceeded will enter an alert state from which
