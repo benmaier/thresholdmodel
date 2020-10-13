@@ -7,6 +7,102 @@ _S = 0
 _I = 1
 
 class ThreshModel():
+    """
+    A simple simulation class that runs 
+    a threshold-model activation process
+    on a static network (potentially weighted and directed)
+    in continuous time using Gillespie's 
+    stochastic simulation algorithm.
+
+    The temporal dimension is fixed by assuming
+    that every node whose activation threshold
+    has been exceeded by neighboring inputs
+    is activated with constant and uniform
+    rate :math:`\gamma = 1`.
+
+    Parameters
+    ==========
+    G : networkx.Graph, networkx.DiGraph
+        The network on which to simulate.
+        Nodes have to be integers.
+    initially_activated: float, int, or list of ints
+        Can be either of three things:
+
+        1. float of value ``0 < initially_activated < 1``.
+           In this case, ``initially_activated`` is
+           interpreted to represent a fraction of nodes
+           that will be randomly selected from the
+           set of nodes and set to be activated.
+        2. int of value ``1 <= initially_activated < N-1``.
+           In this case, ``initially_activated`` nodes
+           will be randomly sampled from the node set
+           and set to be activated.
+        3. list of ints. In this case, ``initially_activated``
+           is interpreted to contain indices of nodes
+           that will be activated initially.
+    thresholds: float or iterable of floats
+        Can be either of two things:
+
+        1. float of value ``0 < thresholds <= 1``.
+           In this case, every node will have the same
+           activation threshold.
+        2. iterable of values ``0 < thresholds <=1``.
+           In this case, the function expectes a list,
+           tuple, or array with length equal to the
+           number of nodes. Each entry `m` of this list
+           will be interpreted to be node `m`'s activation
+           threshold.
+    weight: str, default = None
+        A string that represents the weight keyword of a link.
+        If `None`, the network is assumed to be unweighted.
+
+    Example
+    =======
+
+    >>> G = nx.fast_gnp_random_graph(1000,20/(1000-1))
+    >>> model = TreshModel(G, 100, 0.1)
+    >>> t, cascade_size = model.simulate()
+
+    Attributes
+    ==========
+    G : nx.Graph or nx.DiGraph
+        The network on which to simulate
+    N : int
+        The number of nodes in the network
+    weight: str
+        A string that represents the weight keyword of a link.
+        If `None`, the network is assumed to be unweighted.
+    in_deg : numpy.ndarray
+        Contains the in-degree of every node.
+    thresholds: numpy.ndarray
+        Each entry `m` of this array
+        represents node `m`'s activation
+        threshold.
+    initially_activated: numpy.ndarray
+        Each entry of this array contains
+        a node that will be activated initially.
+    time: numpy.ndarray
+        Contains every time point at which a node was
+        activates (after ``simulation()`` was called).
+        The temporal dimension is given by assuming
+        that every node whose activation threshold
+        has been exceeded by activation inputs
+        is activated with constant and uniform
+        rate :math:`\gamma = 1`.
+    cascade_size: numpy.ndarray
+        The relative size of the activation cascade
+        at the corrsponding time value in ``time``
+        (relative to the size of the node set).
+        Only available after ``simulation()`` was called.
+    activated_nodes: list
+        A list of lists. 
+        Each entry contains a list of integers representing
+        the nodes that have been activated  
+        at the corrsponding time value in ``time``.
+        Each list entry will contain only a single node
+        for every other time than the initial time.
+        Only available after ``simulation()`` was called.
+    """
     
     def __init__(self,
             G,
@@ -28,6 +124,24 @@ class ThreshModel():
         self.set_thresholds(thresholds)
 
     def set_thresholds(self,thresholds):
+        """
+        Set node activation thresholds.
+
+        Parameters
+        ==========
+        thresholds: float or iterable of floats
+            Can be either of two things:
+
+            1. float of value ``0 < thresholds <= 1``.
+               In this case, every node will have the same
+               activation threshold.
+            2. iterable of values ``0 < thresholds <=1``.
+               In this case, the function expectes a list,
+               tuple, or array with length equal to the
+               number of nodes. Each entry `m` of this list
+               will be interpreted to be node `m`'s activation
+               threshold.
+        """
 
         if not hasattr(thresholds,"__len__"):
             assert(thresholds > 0 and thresholds <= 1)
@@ -41,6 +155,27 @@ class ThreshModel():
 
 
     def set_initially_activated(self,initially_activated):
+        """
+        Set the process's initial activation state.
+
+        Parameters
+        ==========
+        initially_activated: float, int, or list of ints
+            Can be either of three things:
+
+            1. float of value ``0 < initially_activated < 1``.
+               In this case, ``initially_activated`` is
+               interpreted to represent a fraction of nodes
+               that will be randomly selected from the
+               set of nodes and set to be activated.
+            2. int of value ``1 <= initially_activated < N-1``.
+               In this case, ``initially_activated`` nodes
+               will be randomly sampled from the node set
+               and set to be activated.
+            3. list of ints. In this case, ``initially_activated``
+               is interpreted to contain indices of nodes
+               that will be activated initially.
+        """
 
         if not hasattr(initially_activated,"__len__"):
             if initially_activated < 1 and initially_activated > 0:
@@ -58,6 +193,9 @@ class ThreshModel():
 
 
     def reset(self):
+        """
+        Reset the simulation.
+        """
 
         self.node_status = np.zeros((self.N,),dtype=int)
         self.node_status[self.initially_activated] = _I
@@ -72,7 +210,7 @@ class ThreshModel():
                     if not self.weight:
                         self.activation_influx[neigh] += 1
                     else:
-                        self.activation_influx[neigh] += self.G.edges[a,neigh][weight]
+                        self.activation_influx[neigh] += self.G.edges[a,neigh][self.weight]
                     nodes_with_influx.add(neigh)
 
         for i in nodes_with_influx:
@@ -87,6 +225,28 @@ class ThreshModel():
 
     
     def simulate(self,save_activated_nodes=False):
+        """
+        Simulate until all nodes that can be activated
+        have been activated.
+
+        Parameters
+        ==========
+        save_activated_nodes: bool, default = False
+            If ``True``, write a list of activated nodes 
+            to the class attribute ``activated_nodes``
+            every time an activation event happens.
+            Such a list will contain only a single node
+            for every other time than the initial time.
+
+        Returns
+        =======
+        time : numpy.ndarray
+            Time points at which nodes were activated.
+        cascade_size : numpy.ndarray
+            The relative size of the activation cascade
+            at the corrsponding time value in ``time``
+            (relative to the size of the node set).
+        """
 
         self.reset()
 

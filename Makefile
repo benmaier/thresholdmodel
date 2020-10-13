@@ -16,7 +16,7 @@ pyclean:
 	-rm -rf ./build/
 
 python:
-	pip install -e ../thresholdmodel --no-binary :all:
+	pip install -e ../thresholdmodel
 
 checkdocs:
 	python setup.py checkdocs

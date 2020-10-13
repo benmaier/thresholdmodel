@@ -12,7 +12,7 @@ setup(
     author_email = __email__,
     url = 'https://github.com/benmaier/thresholdmodel',
     license = __license__,
-    description = "Simulate the continuous-time threshold model on static networks.",
+    description = "Simulate a continuous-time threshold model on static networks.",
     long_description = '',
     packages = setuptools.find_packages(),
     setup_requires = [
