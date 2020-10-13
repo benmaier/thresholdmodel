@@ -27,6 +27,4 @@ pypi:
 	twine upload dist/*
 
 readme:
-	pandoc --from markdown_github --to rst README.md > _README.rst
-	sed -e "s/^\:\:/\.\. code\:\: bash/g" _README.rst > README.rst
-	rm _README.rst
+	pandoc --from markdown_github --to rst README.md > README.rst

@@ -3,10 +3,10 @@
 Contains a bunch of information about this package.
 """
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 __author__ = "Benjamin F. Maier"
-__copyright__ = "Copyright 2019, Benjamin F. Maier"
+__copyright__ = "Copyright 2019-2020, Benjamin F. Maier"
 __credits__ = ["Benjamin F. Maier"]
 __license__ = "MIT"
 __maintainer__ = "Benjamin F. Maier"

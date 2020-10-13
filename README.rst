@@ -14,7 +14,7 @@ enter the activated state with rate $\gamma = 1$.
 Install
 -------
 
-.. code:: bash
+::
 
    git clone https://github.com/benmaier/thresholdmodel.git
    pip install ./thresholdmodel
@@ -160,7 +160,7 @@ Docstring
 
 This is the model's docstring.
 
-.. code:: bash
+::
 
    >>> help(ThreshModel)
    Help on class ThreshModel in module thresholdmodel.model:
