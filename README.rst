@@ -9,7 +9,7 @@ In contrast to the original discrete-time model, nodes whose aggregated
 inputs exceed their respective thresholdes will not flip after the "next
 time step" because there are no time steps. Instead, a node whose
 threshold has been exceeded will enter an alert state from which it will
-enter the activated state with rate $gamma = 1$.
+enter the activated state with rate $\gamma = 1$.
 
 Install
 -------
