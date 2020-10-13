@@ -13,8 +13,7 @@ it will enter the activated state with rate $\gamma = 1$.
 
 ## Install
 
-    git clone https://github.com/benmaier/thresholdmodel.git
-    pip install ./thresholdmodel
+    pip install thresholdmodel
 
 ## Example
 

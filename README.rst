@@ -16,8 +16,7 @@ Install
 
 ::
 
-   git clone https://github.com/benmaier/thresholdmodel.git
-   pip install ./thresholdmodel
+   pip install thresholdmodel
 
 Example
 -------
