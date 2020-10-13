@@ -184,7 +184,8 @@ This is the model's docstring.
     |  ==========
     |  G : networkx.Graph, networkx.DiGraph
     |      The network on which to simulate.
-    |      Nodes have to be integers.
+    |      Nodes must be integers in the range
+    |      of ``[0, N-1]``.
     |  initially_activated: float, int, or list of ints
     |      Can be either of three things:
     |
@@ -226,7 +227,9 @@ This is the model's docstring.
     |  Attributes
     |  ==========
     |  G : nx.Graph or nx.DiGraph
-    |      The network on which to simulate
+    |      The network on which to simulate.
+    |      Nodes must be integers in the range
+    |      of ``[0, N-1]``.
     |  N : int
     |      The number of nodes in the network
     |  weight: str

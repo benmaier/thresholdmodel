@@ -24,7 +24,8 @@ class ThreshModel():
     ==========
     G : networkx.Graph, networkx.DiGraph
         The network on which to simulate.
-        Nodes have to be integers.
+        Nodes must be integers in the range
+        of ``[0, N-1]``.
     initially_activated: float, int, or list of ints
         Can be either of three things:
 
@@ -66,7 +67,9 @@ class ThreshModel():
     Attributes
     ==========
     G : nx.Graph or nx.DiGraph
-        The network on which to simulate
+        The network on which to simulate.
+        Nodes must be integers in the range
+        of ``[0, N-1]``.
     N : int
         The number of nodes in the network
     weight: str
@@ -115,10 +118,12 @@ class ThreshModel():
         self.N = self.G.number_of_nodes()
         self.weight = weight
 
+        assert(set(self.G.nodes()) == set(list(range(self.N))))
+
         if nx.is_directed(G):
-            self.in_deg = np.array([self.G.in_degree(i,weight=weight) for i in G.nodes()],dtype=float)
+            self.in_deg = np.array([self.G.in_degree(i,weight=weight) for i in range(self.N) ],dtype=float)
         else:
-            self.in_deg = np.array([self.G.degree(i,weight=weight) for i in G.nodes()],dtype=float)
+            self.in_deg = np.array([self.G.degree(i,weight=weight) for i in range(self.N) ],dtype=float)
 
         self.set_initially_activated(initially_activated)
         self.set_thresholds(thresholds)
@@ -201,13 +206,13 @@ class ThreshModel():
         self.node_status[self.initially_activated] = _I
 
         self.nodes_that_will_flip = set()
-        self.activation_influx = np.zeros((self.N,),dtype=int)
+        self.activation_influx = np.zeros((self.N,),dtype=float)
 
         nodes_with_influx = set()
         for a in self.initially_activated:
             for neigh in self.G.neighbors(a):
                 if self.node_status[neigh] == _S:
-                    if not self.weight:
+                    if self.weight is None:
                         self.activation_influx[neigh] += 1
                     else:
                         self.activation_influx[neigh] += self.G.edges[a,neigh][self.weight]
@@ -261,10 +266,10 @@ class ThreshModel():
 
             for neigh in self.G.neighbors(activated_node):
                 if self.node_status[neigh] == _S:
-                    if not self.weight:
+                    if self.weight is None:
                         self.activation_influx[neigh] += 1
                     else:
-                        self.activation_influx[neigh] += self.G.edges[activated_node,neigh][weight]
+                        self.activation_influx[neigh] += self.G.edges[activated_node,neigh][self.weight]
                     if self.activation_influx[neigh] >= self.thresholds[neigh]:
                         self.nodes_that_will_flip.add(neigh)
 
@@ -274,7 +279,7 @@ class ThreshModel():
             self.cascade_size.append(self.A)
 
             if save_activated_nodes:
-                self.activated_nodes.append([a])
+                self.activated_nodes.append([activated_node])
 
         return np.array(self.time,dtype=float), np.array(self.cascade_size,dtype=float) / self.N
 
