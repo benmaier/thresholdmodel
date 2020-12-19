@@ -8,10 +8,10 @@ _I = 1
 
 class ThreshModel():
     """
-    A simple simulation class that runs 
+    A simple simulation class that runs
     a threshold-model activation process
     on a static network (potentially weighted and directed)
-    in continuous time using Gillespie's 
+    in continuous time using Gillespie's
     stochastic simulation algorithm.
 
     The temporal dimension is fixed by assuming
@@ -98,15 +98,15 @@ class ThreshModel():
         (relative to the size of the node set).
         Only available after ``simulation()`` was called.
     activated_nodes: list
-        A list of lists. 
+        A list of lists.
         Each entry contains a list of integers representing
-        the nodes that have been activated  
+        the nodes that have been activated
         at the corrsponding time value in ``time``.
         Each list entry will contain only a single node
         for every other time than the initial time.
         Only available after ``simulation()`` was called.
     """
-    
+
     def __init__(self,
             G,
             initially_activated,
@@ -153,8 +153,9 @@ class ThreshModel():
             thresholds = np.ones(self.N,dtype=float) * thresholds
 
         else:
-            assert(len(thresholds) == N)
-            assert(np.all(thresholds <= 1) and np.all(thresholds>=0))
+            assert(len(thresholds) == self.N)
+            assert(np.all(np.array(thresholds) <= 1) and \
+                   np.all(np.array(thresholds) >= 0))
 
         self.thresholds = np.array(thresholds,dtype=float) * self.in_deg
 
@@ -298,7 +299,7 @@ if __name__=="__main__":
     N = B**L
     k = 10
     mu = -0.8
-    thresholds = 0.1
+    thresholds = [0.1]*N
     initially_infected = np.arange(10)
 
     #G = to_networkx_graph(*modular_hierarchical_network(B,L,k,mu))
